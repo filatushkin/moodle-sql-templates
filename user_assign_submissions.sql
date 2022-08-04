@@ -13,7 +13,11 @@ select
     #asgn.intro as assignment_text,
     #ast.onlinetext as submission_text,
     IF(asf.numfiles > 0, 'yes', 'no') as hasattach,
-    ag.grade as grade
+    ag.grader as graderid,
+    gr.firstname as grader_firstname,
+    gr.lastname as grader_lastname,
+    ag.grade as grade,
+    fc.commenttext
 from
     mdl_assign_submission subm
     inner join mdl_assign asgn on (asgn.id = subm.assignment)
@@ -35,6 +39,15 @@ from
         ag.assignment = subm.assignment
         and subm.userid = ag.userid
         and ag.attemptnumber = subm.attemptnumber
+    )
+                
+    left join mdl_user gr on (
+        gr.id = ag.grader
+    )
+        
+    left join mdl_assignfeedback_comments fc on (
+        fc.assignment = asgn.id
+        and fc.grade = ag.id
     )
 where
     subm.status = 'submitted'
